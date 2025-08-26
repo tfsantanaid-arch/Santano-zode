@@ -52,14 +52,23 @@ function nextAuthFolder() {
 }
 
 // Menu text + image (exact as requested)
-const MENU_TEXT = `*Adam_D'H7*
-*》》》○Menu*
-*》》》●Tagall*
-*》》》○Hidetag [tèks]*
-*》》》○Del*
-*》》》●Kickall*
-*》》》○Qr [tèks]*
->》》》》》》》D'H7:Tergene`;
+const MENU_TEXT = `╔═════『 BOT INFO 』═════╗
+│ 👑 Owner     : ○ Adam_D'H7
+│ 🧩 Version   : ● 1.0.0
+│ 🛠️ Type      : ○ Node.js
+│ ⚡ Vitesse   : ● 20px
+╚══════════════════════╝
+
+📜 MENU COMMANDES :
+• ○ Menu
+• ● Tagall
+• ○ Hidetag [texte]
+• ○ Del
+• ● Kickall
+• ○ Qr [texte]
+
+───────────────
+© D'H7 : Tergene`;
 
 const IMAGE_URL = 'https://res.cloudinary.com/dckwrqrur/image/upload/v1755413146/tf-stream-url/13362d64459b2b250982b79433f899d8_0_cn1l26.jpg';
 
