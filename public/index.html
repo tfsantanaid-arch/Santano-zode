@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Santana-Zone</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--accent:#06b6d4;--muted:#94a3b8;color-scheme:dark}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;background:linear-gradient(180deg,#071028 0%, #071a2a 100%);color:white;margin:0;padding:28px}
+    .container{max-width:920px;margin:0 auto}
+    header{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+    header img{width:48px;height:48px;border-radius:8px}
+    h1{font-size:20px;margin:0}
+    .buttons{display:flex;gap:12px;margin:18px 0}
+    .btn{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.04);padding:12px 18px;border-radius:10px;cursor:pointer;display:flex;gap:10px;align-items:center}
+    .btn:hover{transform:translateY(-2px)}
+    .logo{width:34px;height:34px;border-radius:6px;object-fit:cover}
+    .status{margin-top:14px;color:var(--muted)}
+    /* modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:50}
+    .modal{background:linear-gradient(180deg,#041527,#072033);padding:18px;border-radius:12px;width:360px;box-shadow:0 8px 30px rgba(2,6,23,0.6)}
+    .field{display:flex;flex-direction:column;margin-bottom:10px}
+    .field label{font-size:13px;color:var(--muted);margin-bottom:6px}
+    .field input{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:white}
+    .row{display:flex;gap:10px;justify-content:flex-end;margin-top:8px}
+    .small{font-size:13px;color:var(--muted)}
+    /* qr */
+    .qr-wrap{margin-top:18px;display:flex;gap:20px;flex-wrap:wrap}
+    .card{background:rgba(255,255,255,0.03);padding:14px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
+    img.qr{width:260px;height:260px;border-radius:8px;background:white;padding:6px}
+    .meta{max-width:300px}
+    pre{white-space:pre-wrap;word-break:break-word;color:var(--muted);font-size:13px}
+    button.primary{background:linear-gradient(90deg,var(--accent),#3b82f6);border:none;color:#002; padding:9px 12px;border-radius:8px;font-weight:600}
+    button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:white;padding:8px 10px;border-radius:8px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <img src="https://res.cloudinary.com/dckwrqrur/image/upload/v1756182697/tf-stream-url/IMG-20250826-WA0001_crowb2.jpg" alt="logo">
+      <div>
+        <h1>Santana-Zone.Id</h1>
+        <div class="small">Choisissez un profil, entrez le nom & numéro, puis validez pour obtenir le QR</div>
+      </div>
+    </header>
+
+    <div class="buttons">
+      <button class="btn" data-profile="D'H7 | Tergene">
+        <img class="logo" src="https://res.cloudinary.com/dckwrqrur/image/upload/v1756182441/tf-stream-url/IMG-20250825-WA0014_j3k2rh.jpg" alt="adam">
+        <div>
+          <strong>𝐋𝐎𝐑𝐃 𝐊𝐈𝐍𝐆 𝐒𝚫𝚴𝚻𝚫𝚴𝚫</strong><div class="small">D'H7 | Tergene</div>
+        </div>
+      </button>
+
+      <button class="btn" data-profile="D'H7 | Tergene">
+        <img class="logo" src="https://res.cloudinary.com/dckwrqrur/image/upload/v1756182631/tf-stream-url/IMG-20250826-WA0000_t7t017.jpg" alt="tf">
+        <div>
+          <strong>𝐋𝐎𝐑𝐃 𝐊𝐈𝐍𝐆 𝐒𝚫𝚴𝚻𝚫𝚴𝚫-V2</strong><div class="small">D'H7 | Tergene</div>
+        </div>
+      </button>
+    </div>
+
+    <div class="status small" id="status">Status: <span id="sttxt">idle</span></div>
+
+    <div class="qr-wrap" id="qr-wrap"></div>
+
+    <div style="margin-top:20px">
+      <button id="list" class="ghost">Lister sessions</button>
+      <div id="sessionsList" class="small" style="margin-top:10px"></div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-backdrop" id="modal">
+    <div class="modal">
+      <h3 id="modalTitle">Créer une session</h3>
+
+      <div class="field">
+        <label>Name</label>
+        <input id="inName" placeholder="Votre nom (ex: Adam_D'H7)">
+      </div>
+
+      <div class="field">
+        <label>Veuillez entrer un numéro (ex: +50942292687)</label>
+        <input id="inPhone" placeholder="+509...">
+      </div>
+
+      <div class="row">
+        <button class="ghost" id="btnBack">Retour</button>
+        <button class="primary" id="btnValider">Valider</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io(); // connects to same origin where this page is served
+    const modal = document.getElementById('modal');
+    const inName = document.getElementById('inName');
+    const inPhone = document.getElementById('inPhone');
+    const btnBack = document.getElementById('btnBack');
+    const btnValider = document.getElementById('btnValider');
+    const sttxt = document.getElementById('sttxt');
+    const qrWrap = document.getElementById('qr-wrap');
+    const sessionsList = document.getElementById('sessionsList');
+
+    let activeProfile = null;
+    let lastSession = null;
+
+    document.querySelectorAll('.btn[data-profile]').forEach(b => {
+      b.addEventListener('click', () => {
+        activeProfile = b.getAttribute('data-profile');
+        document.getElementById('modalTitle').textContent = `Créer une session pour: ${activeProfile}`;
+        inName.value = '';
+        inPhone.value = '';
+        modal.style.display = 'flex';
+      });
+    });
+
+    btnBack.addEventListener('click', () => { modal.style.display = 'none'; });
+
+    btnValider.addEventListener('click', () => {
+      const name = inName.value.trim();
+      const phone = inPhone.value.trim();
+      if (!phone) { alert('Veuillez entrer un numéro'); return; }
+      sttxt.textContent = 'Requesting session...';
+      qrWrap.innerHTML = '';
+      socket.emit('create_session', { profile: activeProfile, name, phone });
+      modal.style.display = 'none';
+    });
+
+    // show created
+    socket.on('session_created', ({ sessionId, folderName }) => {
+      lastSession = sessionId;
+      sttxt.textContent = 'Session created: ' + folderName;
+    });
+
+    socket.on('qr', ({ sessionId, qrDataUrl, qrString }) => {
+      sttxt.textContent = 'Scan QR with WhatsApp (session: ' + sessionId + ')';
+      const html = `
+        <div class="card">
+          <img class="qr" src="${qrDataUrl || ''}" alt="qr"/>
+        </div>
+        <div class="card meta">
+          <div><strong>Session:</strong> ${sessionId}</div>
+          <div style="margin-top:8px"><strong>Info:</strong></div>
+          <pre>${qrString ? qrString : 'Scan the QR code image'}</pre>
+        </div>
+      `;
+      qrWrap.innerHTML = html;
+    });
+
+    socket.on('connected', ({ sessionId }) => {
+      sttxt.textContent = '✅ Connected: ' + sessionId;
+      // Optionally show details of the connected session
+      // You could offer a "download credentials" action by instructing admin to access sessions folder on server
+    });
+
+    socket.on('disconnected', ({ sessionId, reason }) => {
+      sttxt.textContent = 'Disconnected: ' + sessionId + ' (reason: ' + reason + ')';
+    });
+
+    socket.on('error', (e) => {
+      sttxt.textContent = 'Error: ' + (e.message || JSON.stringify(e));
+    });
+
+    // list sessions
+    document.getElementById('list').addEventListener('click', () => {
+      socket.emit('list_sessions');
+    });
+
+    socket.on('sessions_list', (arr) => {
+      if (!arr || !arr.length) { sessionsList.textContent = 'Aucune session.'; return; }
+      sessionsList.innerHTML = '';
+      arr.forEach(s => {
+        const el = document.createElement('div');
+        el.className = 'small card';
+        el.style.marginTop = '6px';
+        el.innerHTML = `<strong>${s.folder}</strong><div style="margin-top:6px"><pre>${JSON.stringify(s.meta, null, 2)}</pre></div>`;
+        sessionsList.appendChild(el);
+      });
+    });
+  </script>
+</body>
+  </html>
