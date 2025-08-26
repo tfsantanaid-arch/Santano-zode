@@ -1,0 +1,27 @@
+{
+  "dependencies": {
+    "baileys": "^6.7.18",
+    "express": "^5.1.0",
+    "node-fetch": "^3.3.2",
+    "pino": "^9.9.0",
+    "qr": "^0.5.0",
+    "qrcode": "^1.5.4",
+    "socket.io": "^4.8.1",
+    "telegraf": "^4.16.3",
+    "terminal": "^0.1.4",
+    "uuid": "^11.1.0",
+    "ws": "^8.18.3"
+  },
+  "name": "home",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {},
+  "description": ""
+}
